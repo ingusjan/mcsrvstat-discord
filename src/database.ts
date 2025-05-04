@@ -1,5 +1,10 @@
 import fs from "fs";
 import path from "path";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+// Initialize dayjs plugins
+dayjs.extend(relativeTime);
 
 // Define interfaces for our database
 export interface PlayerRecord {
@@ -119,9 +124,8 @@ export function getRecentlySeenPlayers(
   daysToKeep = 7
 ): PlayerRecord[] {
   const db = loadDatabase();
-  const now = new Date();
-  const cutoffDate = new Date(now);
-  cutoffDate.setDate(now.getDate() - daysToKeep);
+  const now = dayjs();
+  const cutoffDate = now.subtract(daysToKeep, "day");
 
   return db.players
     .filter((player) => {
@@ -129,12 +133,12 @@ export function getRecentlySeenPlayers(
       if (onlinePlayers.includes(player.name)) return false;
 
       // Check if the player was seen within the cutoff period
-      const lastSeenDate = new Date(player.lastSeen);
-      return lastSeenDate > cutoffDate;
+      const lastSeenDate = dayjs(player.lastSeen);
+      return lastSeenDate.isAfter(cutoffDate);
     })
     .sort((a, b) => {
       // Sort by most recently seen first
-      return new Date(b.lastSeen).getTime() - new Date(a.lastSeen).getTime();
+      return dayjs(b.lastSeen).unix() - dayjs(a.lastSeen).unix();
     });
 }
 
@@ -144,21 +148,20 @@ export function getRecentlySeenPlayers(
  * @returns Formatted string like "2 days ago" or "5 hours ago"
  */
 export function formatLastSeen(isoTimestamp: string): string {
-  const lastSeen = new Date(isoTimestamp);
-  const now = new Date();
-
-  const diffMs = now.getTime() - lastSeen.getTime();
-  const diffMinutes = Math.floor(diffMs / (1000 * 60));
-
+  const lastSeen = dayjs(isoTimestamp);
+  const now = dayjs();
+  
+  const diffMinutes = now.diff(lastSeen, "minute");
+  
   if (diffMinutes < 60) {
     return `${diffMinutes} minute${diffMinutes !== 1 ? "s" : ""} ago`;
   }
-
-  const diffHours = Math.floor(diffMinutes / 60);
+  
+  const diffHours = now.diff(lastSeen, "hour");
   if (diffHours < 24) {
     return `${diffHours} hour${diffHours !== 1 ? "s" : ""} ago`;
   }
-
-  const diffDays = Math.floor(diffHours / 24);
+  
+  const diffDays = now.diff(lastSeen, "day");
   return `${diffDays} day${diffDays !== 1 ? "s" : ""} ago`;
 }

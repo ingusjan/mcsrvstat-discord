@@ -3,6 +3,7 @@
 A Discord bot that periodically checks and displays the status of a Minecraft server using the [mcsrvstat.us API](https://api.mcsrvstat.us/).
 
 ## Example
+
 ![image](https://github.com/user-attachments/assets/4d16834d-9549-4008-9e87-dff18c396273)
 
 ## Features
@@ -33,38 +34,69 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
 ### Installation
 
 1. Clone this repository:
+
    ```
    git clone https://github.com/ingusjan/minecraft-discord-status.git
    cd minecraft-discord-status
    ```
 
 2. Install dependencies using Yarn:
+
    ```
    yarn
    ```
 
 3. Copy the example environment file and fill in your details:
+
    ```
    cp .env.example .env
    ```
 
 4. Edit the `.env` file with your specific configuration:
-   - `DISCORD_TOKEN`: Your Discord bot token
-   - `CHANNEL_ID`: The Discord channel ID where updates will be sent
-   - `MC_SERVER_ADDRESS`: Your Minecraft server address (e.g., `mc.example.com` or IP address)
-   - `UPDATE_INTERVAL`: How often to check for updates (in minutes)
-   - `RECENT_PLAYER_DAYS`: How many days to show players in the "Recently Online" list (optional, defaults to 7)
-   - `MONGO_URI`: MongoDB connection string (default: `mongodb://localhost:27017/minecraft-discord-status`)
+
+   ```
+
+   ```
+
+# Discord Bot Token
+
+DISCORD_TOKEN=your_discord_bot_token_here
+
+# Discord Channel ID to send server status updates
+
+CHANNEL_ID=your_channel_id_here
+
+# Minecraft Server Address
+
+MC_SERVER_ADDRESS=your_minecraft_server_address_here
+
+# Update Interval in minutes (how often to check the server status)
+
+UPDATE_INTERVAL=5
+
+# How many days to show players in the "Recently Online" list
+
+RECENT_PLAYER_DAYS=7
+
+# MongoDB Connection URI
+
+MONGO_URI=mongodb://localhost:27017/minecraft-discord-status
+
+```
 
 5. Build the TypeScript code:
-   ```
-   yarn build
-   ```
+```
+
+yarn build
+
+```
 
 6. Run the bot:
-   ```
-   yarn start
-   ```
+```
+
+yarn start
+
+```
 
 ### Inviting the Bot to Your Server
 
@@ -72,12 +104,12 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
 2. Select your application
 3. Go to the "OAuth2" section
 4. In the "URL Generator", select the following scopes:
-   - `bot`
-   - `applications.commands`
+- `bot`
+- `applications.commands`
 5. For bot permissions, select:
-   - "Send Messages"
-   - "Embed Links"
-   - "Read Message History"
+- "Send Messages"
+- "Embed Links"
+- "Read Message History"
 6. Copy the generated URL and open it in your browser to invite the bot to your server
 
 ## Hosting
@@ -91,8 +123,8 @@ The easiest way to host this bot is to deploy Coolify using Hetzner Cloud:
 1. Sign up for [Hetzner Cloud](https://hetzner.cloud/?ref=YBJPKaZ3842f)
 2. Deploy Coolify using Hetzner's one-click app: [Coolify on Hetzner](https://docs.hetzner.com/cloud/apps/list/coolify/)
 3. Within Coolify, create a new project that includes:
-   - This Node.js application (connect to your GitHub repository)
-   - A MongoDB database within the same project
+- This Node.js application (connect to your GitHub repository)
+- A MongoDB database within the same project
 4. Copy the MongoDB URI from Coolify into your application's environment variables
 5. Deploy your application
 
@@ -112,10 +144,12 @@ MongoDB provides better reliability, scalability, and performance compared to th
 To update the bot to the latest version:
 
 ```
+
 git pull
 yarn
 yarn build
 yarn start
+
 ```
 
 ## Contributing
@@ -131,3 +165,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - [mcsrvstat.us](https://mcsrvstat.us/) for providing the Minecraft server status API
 - [discord.js](https://discord.js.org/) for the Discord API wrapper
 - [mongoose](https://mongoosejs.com/) for MongoDB object modeling
+```

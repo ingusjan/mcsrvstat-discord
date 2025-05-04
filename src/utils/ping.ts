@@ -1,12 +1,8 @@
-import { Socket } from "net";
-import dns from "dns";
-import { promisify } from "util";
+import * as pingLib from "ping";
 import { logger } from "./logger";
 
-const dnsLookup = promisify(dns.lookup);
-
 /**
- * Ping a server IP directly using a basic TCP connection
+ * Ping a server IP using the ping npm library
  * @param serverAddress IP address or hostname of the server
  * @returns Ping time in milliseconds, or undefined if ping failed
  */
@@ -17,53 +13,32 @@ export async function pingServerIP(
     // Extract just the hostname without port
     const hostname = serverAddress.split(":")[0];
 
-    // First, resolve the hostname to an IP address
-    const startDns = Date.now();
-    const { address } = await dnsLookup(hostname);
-    const dnsTime = Date.now() - startDns;
-
-    logger.info(`Resolved ${hostname} to ${address} in ${dnsTime}ms`);
-
-    // Now measure the time it takes to establish a TCP connection
-    const startTime = Date.now();
-
-    // Create a promise that resolves when the connection is established or rejects on error
-    const connectPromise = new Promise<number>((resolve, reject) => {
-      const socket = new Socket();
-
-      // Set a timeout of 5 seconds
-      socket.setTimeout(5000);
-
-      socket.on("connect", () => {
-        const connectTime = Date.now() - startTime;
-        socket.destroy();
-        resolve(connectTime);
-      });
-
-      socket.on("timeout", () => {
-        socket.destroy();
-        reject(new Error("Connection timed out"));
-      });
-
-      socket.on("error", (err) => {
-        socket.destroy();
-        reject(err);
-      });
-
-      // Try to connect to port 80 (HTTP) which is commonly open
-      // We don't actually care about the service, just that we can reach the server
-      socket.connect(80, address);
+    // Use the ping library to ping the server
+    const result = await pingLib.promise.probe(hostname, {
+      timeout: 5, // 5 seconds timeout
+      min_reply: 1, // Only need one successful response
     });
 
-    const connectTime = await connectPromise;
+    if (result.alive) {
+      // Handle the case where time might be a number or "unknown"
+      const pingTime =
+        typeof result.time === "number"
+          ? result.time
+          : result.time === "unknown"
+          ? undefined
+          : parseFloat(result.time);
 
-    // Total ping time is DNS lookup + TCP connection time
-    const totalPingTime = dnsTime + connectTime;
-    logger.info(
-      `Ping to ${hostname} completed in ${totalPingTime}ms (DNS: ${dnsTime}ms, TCP: ${connectTime}ms)`
-    );
-
-    return totalPingTime;
+      if (pingTime !== undefined) {
+        logger.info(`Ping to ${hostname} completed in ${pingTime}ms`);
+        return pingTime;
+      } else {
+        logger.warn(`Could not determine ping time for ${serverAddress}`);
+        return undefined;
+      }
+    } else {
+      logger.warn(`Could not ping server ${serverAddress}: Host is not alive`);
+      return undefined;
+    }
   } catch (error) {
     logger.warn(
       `Could not ping server ${serverAddress}: ${

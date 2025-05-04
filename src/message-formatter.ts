@@ -31,11 +31,7 @@ export async function createStatusEmbed(
 ): Promise<EmbedBuilder> {
   const config = loadConfig();
   const embed = new EmbedBuilder()
-    .setTitle(
-      `Minecraft Server Status: ${status.ip}${
-        status.port !== 25565 ? `:${status.port}` : ""
-      }`
-    )
+    .setTitle(`Minecraft Server Status: ${config.mcServerAddress}`)
     .setColor(status.online ? COLORS.ONLINE : COLORS.OFFLINE)
     .setTimestamp()
     .setFooter({ text: "Last updated" });
@@ -59,7 +55,15 @@ export async function createStatusEmbed(
 
   // Add basic server info
   embed.addFields(
-    { name: "Status", value: `🟢 Online${pingInfo}`, inline: true },
+    { name: "Status", value: `🟢 Online${pingInfo}`, inline: true }
+  );
+
+  // Add direct connection IP field right after status
+  const directIp = `${status.ip}${status.port !== 25565 ? `:${status.port}` : ""}`;
+  embed.addFields({ name: "🔌 Direct IP", value: directIp, inline: true });
+
+  // Add version info
+  embed.addFields(
     { name: "Version", value: status.version || "Unknown", inline: true }
   );
 
@@ -72,7 +76,7 @@ export async function createStatusEmbed(
   if (status.motd?.clean && status.motd.clean.length > 0) {
     const motd = status.motd.clean.join("\n").trim();
     if (motd) {
-      embed.setDescription(`**MOTD:**\n${motd}`);
+      embed.setDescription(motd);
     }
   }
 

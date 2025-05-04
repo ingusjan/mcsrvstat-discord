@@ -1,5 +1,5 @@
 {
-  "name": "minecraft-discord-status",
+  "name": "mcsrvstat-discord",
   "version": "1.0.0",
   "main": "dist/index.js",
   "author": "Ingus Jansons <ingusjan@gmail.com>",
@@ -14,8 +14,10 @@
   "description": "",
   "dependencies": {
     "axios": "^1.9.0",
+    "chalk": "4",
     "dayjs": "^1.11.13",
     "discord.js": "^14.19.3",
+    "mongoose": "^8.14.1",
     "node-cron": "^3.0.3",
     "typescript": "^5.8.3"
   },

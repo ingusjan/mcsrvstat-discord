@@ -9,12 +9,10 @@ import {
   saveMessageId,
   getLastMessageId,
 } from "./database";
+import { logger } from "./utils/logger";
 
 // Load configuration
 const config = loadConfig();
-
-// Initialize database
-initDatabase();
 
 // Initialize Discord client
 const client = new Client({
@@ -27,7 +25,7 @@ async function updateServerStatus() {
     // Get the target channel
     const channel = await client.channels.fetch(config.channelId);
     if (!channel || !(channel instanceof TextChannel)) {
-      console.error(
+      logger.error(
         `Channel with ID ${config.channelId} not found or is not a text channel.`
       );
       return;
@@ -41,14 +39,14 @@ async function updateServerStatus() {
       const onlinePlayerNames = serverStatus.players.list.map(
         (player) => player.name
       );
-      updatePlayerActivity(onlinePlayerNames);
+      await updatePlayerActivity(onlinePlayerNames);
     }
 
     // Create formatted embed with server information
-    const statusEmbed = createStatusEmbed(serverStatus);
+    const statusEmbed = await createStatusEmbed(serverStatus);
 
     // Try to retrieve the last message ID from the database
-    const lastMessageId = getLastMessageId();
+    const lastMessageId = await getLastMessageId();
 
     // Try to update existing message, or send a new one if it doesn't exist
     try {
@@ -56,10 +54,10 @@ async function updateServerStatus() {
         try {
           const message = await channel.messages.fetch(lastMessageId);
           await message.edit({ embeds: [statusEmbed] });
-          console.log("Server status message updated.");
+          logger.success("Server status message updated.");
           return; // Exit if successful
         } catch (fetchError) {
-          console.log(
+          logger.warn(
             "Could not find the last message, will search for it or send a new one."
           );
           // Continue to search or create new message
@@ -85,56 +83,70 @@ async function updateServerStatus() {
           // Update the found message
           await message.edit({ embeds: [statusEmbed] });
           // Store the message ID for future use
-          saveMessageId(message.id);
-          console.log("Found and updated existing server status message.");
+          await saveMessageId(message.id);
+          logger.success("Found and updated existing server status message.");
           return; // Exit after updating
         }
       }
 
       // If we get here, we need to create a new message
-      console.log("Sending new server status message.");
+      logger.info("Sending new server status message.");
       const newMessage = await channel.send({ embeds: [statusEmbed] });
-      saveMessageId(newMessage.id);
+      await saveMessageId(newMessage.id);
     } catch (error) {
-      console.error("Error updating server status message:", error);
+      logger.error("Error updating server status message:", error);
 
       // If all else fails, create a new message
       try {
         const newMessage = await channel.send({ embeds: [statusEmbed] });
-        saveMessageId(newMessage.id);
-        console.log("Sent new server status message as fallback.");
+        await saveMessageId(newMessage.id);
+        logger.success("Sent new server status message as fallback.");
       } catch (sendError) {
-        console.error("Failed to send new message:", sendError);
+        logger.error("Failed to send new message:", sendError);
       }
     }
   } catch (error) {
-    console.error("Error updating server status:", error);
+    logger.error("Error updating server status:", error);
   }
 }
 
-// Set up event handlers
-client.once(Events.ClientReady, (readyClient) => {
-  console.log(`Bot logged in as ${readyClient.user.tag}`);
+// Main async function to start the bot after database initialization
+async function main() {
+  try {
+    // Initialize MongoDB database connection
+    await initDatabase();
 
-  // Update server status immediately on startup
-  updateServerStatus();
+    // Login to Discord
+    await client.login(config.discordToken);
 
-  // Schedule periodic updates
-  const cronExpression = `*/${config.updateInterval} * * * *`; // Run every X minutes
-  cron.schedule(cronExpression, updateServerStatus);
+    // Set up event handlers
+    client.once(Events.ClientReady, (readyClient) => {
+      logger.success(`Bot logged in as ${readyClient.user.tag}`);
 
-  console.log(
-    `Server status updates scheduled every ${config.updateInterval} minutes.`
-  );
-});
+      // Update server status immediately on startup
+      updateServerStatus();
 
-// Error handling
-client.on(Events.Error, (error) => {
-  console.error("Discord client error:", error);
-});
+      // Schedule periodic updates
+      const cronExpression = `*/${config.updateInterval} * * * *`; // Run every X minutes
+      cron.schedule(cronExpression, updateServerStatus);
 
-// Login to Discord
-client.login(config.discordToken).catch((error) => {
-  console.error("Failed to log in to Discord:", error);
+      logger.info(
+        `Server status updates scheduled every ${config.updateInterval} minutes.`
+      );
+    });
+
+    // Error handling
+    client.on(Events.Error, (error) => {
+      logger.error("Discord client error:", error);
+    });
+  } catch (error) {
+    logger.error("Failed to start the application:", error);
+    process.exit(1);
+  }
+}
+
+// Start the application
+main().catch((error) => {
+  logger.error("Application startup failed:", error);
   process.exit(1);
 });

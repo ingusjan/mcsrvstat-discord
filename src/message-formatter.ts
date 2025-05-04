@@ -18,10 +18,17 @@ const COLORS = {
 const DEFAULT_MINECRAFT_ICON =
   "https://images.icon-icons.com/2699/PNG/512/minecraft_logo_icon_168974.png";
 
+// Cache for recently seen players to avoid multiple DB calls
+let recentlySeenPlayersCache: PlayerRecord[] = [];
+let lastCacheUpdate = 0;
+const CACHE_TTL = 60000; // 1 minute in milliseconds
+
 /**
  * Creates a formatted Discord embed for the Minecraft server status
  */
-export function createStatusEmbed(status: MinecraftServerStatus): EmbedBuilder {
+export async function createStatusEmbed(
+  status: MinecraftServerStatus
+): Promise<EmbedBuilder> {
   const config = loadConfig();
   const embed = new EmbedBuilder()
     .setTitle(
@@ -67,7 +74,7 @@ export function createStatusEmbed(status: MinecraftServerStatus): EmbedBuilder {
   if (status.players) {
     const playerCount = `${status.players.online}/${status.players.max}`;
     const playerField = {
-      name: "👥 Players",
+      name: "🚪 Slots",
       value: playerCount,
       inline: true,
     };
@@ -81,18 +88,24 @@ export function createStatusEmbed(status: MinecraftServerStatus): EmbedBuilder {
     // Add online player list if available
     if (onlinePlayerNames.length > 0) {
       embed.addFields({
-        name: "🎮 Online Players",
+        name: "👥 Online Now",
         value: onlinePlayerNames.join(", "),
       });
     }
 
+    // Refresh cache if needed
+    const now = Date.now();
+    if (now - lastCacheUpdate > CACHE_TTL) {
+      recentlySeenPlayersCache = await getRecentlySeenPlayers(
+        onlinePlayerNames,
+        config.recentPlayerDays
+      );
+      lastCacheUpdate = now;
+    }
+
     // Add recently online players (offline now but seen recently)
-    const recentlySeenPlayers = getRecentlySeenPlayers(
-      onlinePlayerNames,
-      config.recentPlayerDays
-    );
-    if (recentlySeenPlayers.length > 0) {
-      const recentPlayersList = recentlySeenPlayers
+    if (recentlySeenPlayersCache.length > 0) {
+      const recentPlayersList = recentlySeenPlayersCache
         .map((player) => `${player.name} (${formatLastSeen(player.lastSeen)})`)
         .join("\n");
 

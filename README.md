@@ -1,4 +1,4 @@
-# mcsrvstat.us Discord Bot
+# Discord Bot for mcsrvstat
 
 A Discord bot that periodically checks and displays the status of a Minecraft server using the [mcsrvstat.us API](https://api.mcsrvstat.us/).
 
@@ -19,6 +19,7 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
   - Configurable duration for how long to keep player history
 - 📊 **Performance Metrics**: Displays server ping time with color indicators
 - 📝 **Message Persistence**: Edits the same status message across bot restarts
+- 🗄️ **MongoDB Database**: Reliable storage of player activity and message data
 - 🛠️ **Easy Configuration**: Simple environment variables to configure the bot
 - 🌐 **Open Source**: Easy to modify and extend for your own needs
 
@@ -27,6 +28,7 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
 ### Prerequisites
 
 - Node.js (v16 or higher)
+- MongoDB (local or cloud-hosted)
 - A Discord Bot Token ([Create a Discord Bot](https://discord.com/developers/applications))
 - A Discord server where you have permission to add bots
 
@@ -38,9 +40,9 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
    cd minecraft-discord-status
    ```
 
-2. Install dependencies:
+2. Install dependencies using Yarn:
    ```
-   npm install
+   yarn
    ```
 
 3. Copy the example environment file and fill in your details:
@@ -54,15 +56,16 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
    - `MC_SERVER_ADDRESS`: Your Minecraft server address (e.g., `mc.example.com` or IP address)
    - `UPDATE_INTERVAL`: How often to check for updates (in minutes)
    - `RECENT_PLAYER_DAYS`: How many days to show players in the "Recently Online" list (optional, defaults to 7)
+   - `MONGO_URI`: MongoDB connection string (default: `mongodb://localhost:27017/minecraft-discord-status`)
 
 5. Build the TypeScript code:
    ```
-   npm run build
+   yarn build
    ```
 
 6. Run the bot:
    ```
-   npm start
+   yarn start
    ```
 
 ### Inviting the Bot to Your Server
@@ -95,12 +98,12 @@ You can host this Discord bot on [Hetzner Cloud](https://hetzner.cloud/?ref=YBJP
 
 ## Database
 
-The bot uses a simple JSON database stored in the `data/database.json` file to track:
+The bot uses MongoDB to store:
 
-- Player activity (when each player was last seen online)
+- Player activity data (when each player was last seen online)
 - The ID of the last status message for persistence across restarts
 
-No configuration is needed for the database as it's automatically created and managed.
+MongoDB provides better reliability, scalability, and performance compared to the previous JSON file storage. You can use a local MongoDB instance or a cloud-hosted solution like MongoDB Atlas for better reliability.
 
 ## Updating
 
@@ -108,9 +111,9 @@ To update the bot to the latest version:
 
 ```
 git pull
-npm install
-npm run build
-npm start
+yarn
+yarn build
+yarn start
 ```
 
 ## Contributing
@@ -125,3 +128,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 - [mcsrvstat.us](https://mcsrvstat.us/) for providing the Minecraft server status API
 - [discord.js](https://discord.js.org/) for the Discord API wrapper
+- [mongoose](https://mongoosejs.com/) for MongoDB object modeling

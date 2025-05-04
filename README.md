@@ -17,11 +17,9 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
 - 👻 **Player Tracking**: Remembers when players were last online
   - Shows "Recently Online" players with timestamps
   - Configurable duration for how long to keep player history
-- 📊 **Performance Metrics**: Displays server ping time with color indicators
-- 📝 **Message Persistence**: Edits the same status message across bot restarts
+- 📝 **No message spam in Discord**: The same message is re-used across bot restarts
 - 🗄️ **MongoDB Database**: Reliable storage of player activity and message data
-- 🛠️ **Easy Configuration**: Simple environment variables to configure the bot
-- 🌐 **Open Source**: Easy to modify and extend for your own needs
+- 🛠️ **Easy Configuration**: Just change the variables in .env and restart
 
 ## Setup Instructions
 
@@ -84,17 +82,21 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
 
 ## Hosting
 
-### Recommended Hosting: Hetzner Cloud
+### Recommended Hosting: Hetzner Cloud with Coolify
 
 [![Hetzner Cloud](https://cdn.hetzner.com/assets/Uploads/Hetzner-Logo-slogan_space-trans.png)](https://hetzner.cloud/?ref=YBJPKaZ3842f)
 
-You can host this Discord bot on [Hetzner Cloud](https://hetzner.cloud/?ref=YBJPKaZ3842f) with these benefits:
-- Affordable cloud servers starting at €4.15/month
-- Simple setup perfect for Discord bots
-- Excellent performance and reliability
-- Pay-as-you-go billing with no long-term commitments
+The easiest way to host this bot is to deploy Coolify using Hetzner Cloud:
 
-[Sign up for Hetzner Cloud here](https://hetzner.cloud/?ref=YBJPKaZ3842f)
+1. Sign up for [Hetzner Cloud](https://hetzner.cloud/?ref=YBJPKaZ3842f)
+2. Deploy Coolify using Hetzner's one-click app: [Coolify on Hetzner](https://docs.hetzner.com/cloud/apps/list/coolify/)
+3. Within Coolify, create a new project that includes:
+   - This Node.js application (connect to your GitHub repository)
+   - A MongoDB database within the same project
+4. Copy the MongoDB URI from Coolify into your application's environment variables
+5. Deploy your application
+
+You can also host this bot on any platform that supports Node.js applications and MongoDB.
 
 ## Database
 

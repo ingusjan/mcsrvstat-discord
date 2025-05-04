@@ -51,9 +51,15 @@ export async function createStatusEmbed(
     return embed.setDescription("⚠️ **Server is offline** ⚠️");
   }
 
+  // Determine ping info text (without color indicators)
+  let pingInfo = "";
+  if (status.pingMs !== undefined) {
+    pingInfo = ` (${status.pingMs}ms)`;
+  }
+
   // Add basic server info
   embed.addFields(
-    { name: "Status", value: "🟢 Online", inline: true },
+    { name: "Status", value: `🟢 Online${pingInfo}`, inline: true },
     { name: "Version", value: status.version || "Unknown", inline: true }
   );
 
@@ -179,20 +185,8 @@ export async function createStatusEmbed(
     });
   }
 
-  // Create footer text with ping if available
+  // Create footer text
   let footerText = "Last updated";
-
-  // Add ping information if available
-  if (status.pingMs !== undefined) {
-    const pingColor =
-      status.pingMs < 100 ? "🟢" : status.pingMs < 300 ? "🟡" : "🔴";
-    footerText += ` | Ping: ${pingColor} ${status.pingMs}ms`;
-  }
-
-  // Add API version info if available
-  if (status.debug?.apiversion) {
-    footerText += ` | API v${status.debug.apiversion}`;
-  }
 
   // Set the footer with all the combined information
   embed.setFooter({ text: footerText });

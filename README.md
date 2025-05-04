@@ -1,4 +1,4 @@
-# Minecraft Server Status Discord Bot
+# mcsrvstat.us Discord Bot
 
 A Discord bot that periodically checks and displays the status of a Minecraft server using the [mcsrvstat.us API](https://api.mcsrvstat.us/).
 
@@ -11,6 +11,11 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
   - MOTD (Message of the Day)
   - Server version and software
   - Installed plugins and mods
+- 👻 **Player Tracking**: Remembers when players were last online
+  - Shows "Recently Online" players with timestamps
+  - Configurable duration for how long to keep player history
+- 📊 **Performance Metrics**: Displays server ping time with color indicators
+- 📝 **Message Persistence**: Edits the same status message across bot restarts
 - 🛠️ **Easy Configuration**: Simple environment variables to configure the bot
 - 🌐 **Open Source**: Easy to modify and extend for your own needs
 
@@ -45,6 +50,7 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
    - `CHANNEL_ID`: The Discord channel ID where updates will be sent
    - `MC_SERVER_ADDRESS`: Your Minecraft server address (e.g., `mc.example.com` or IP address)
    - `UPDATE_INTERVAL`: How often to check for updates (in minutes)
+   - `RECENT_PLAYER_DAYS`: How many days to show players in the "Recently Online" list (optional, defaults to 7)
 
 5. Build the TypeScript code:
    ```
@@ -69,6 +75,29 @@ A Discord bot that periodically checks and displays the status of a Minecraft se
    - "Embed Links"
    - "Read Message History"
 6. Copy the generated URL and open it in your browser to invite the bot to your server
+
+## Hosting
+
+### Recommended Hosting: Hetzner Cloud
+
+[![Hetzner Cloud](https://cdn.hetzner.com/assets/Uploads/Hetzner-Logo-slogan_space-trans.png)](https://hetzner.cloud/?ref=YBJPKaZ3842f)
+
+You can host this Discord bot on [Hetzner Cloud](https://hetzner.cloud/?ref=YBJPKaZ3842f) with these benefits:
+- Affordable cloud servers starting at €4.15/month
+- Simple setup perfect for Discord bots
+- Excellent performance and reliability
+- Pay-as-you-go billing with no long-term commitments
+
+[Sign up for Hetzner Cloud here](https://hetzner.cloud/?ref=YBJPKaZ3842f)
+
+## Database
+
+The bot uses a simple JSON database stored in the `data/database.json` file to track:
+
+- Player activity (when each player was last seen online)
+- The ID of the last status message for persistence across restarts
+
+No configuration is needed for the database as it's automatically created and managed.
 
 ## Updating
 

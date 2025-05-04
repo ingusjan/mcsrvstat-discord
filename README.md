@@ -2,6 +2,9 @@
 
 A Discord bot that periodically checks and displays the status of a Minecraft server using the [mcsrvstat.us API](https://api.mcsrvstat.us/).
 
+## Example
+![image](https://github.com/user-attachments/assets/0fcf6f48-c8e0-452d-89a6-55bf88924d49)
+
 ## Features
 
 - 🔄 **Auto-updates**: Periodically checks the server status and updates the message

@@ -54,18 +54,24 @@ export async function createStatusEmbed(
   }
 
   // Add basic server info
-  embed.addFields(
-    { name: "Status", value: `🟢 Online${pingInfo}`, inline: true }
-  );
+  embed.addFields({
+    name: "Status",
+    value: `🟢 Online${pingInfo}`,
+    inline: true,
+  });
 
   // Add direct connection IP field right after status
-  const directIp = `${status.ip}${status.port !== 25565 ? `:${status.port}` : ""}`;
+  const directIp = `${status.ip}${
+    status.port !== 25565 ? `:${status.port}` : ""
+  }`;
   embed.addFields({ name: "🔌 Direct IP", value: directIp, inline: true });
 
   // Add version info
-  embed.addFields(
-    { name: "Version", value: status.version || "Unknown", inline: true }
-  );
+  embed.addFields({
+    name: "Version",
+    value: status.version || "Unknown",
+    inline: true,
+  });
 
   // Add software info only if it's not the default "Vanilla"
   if (status.software && status.software !== "Vanilla") {

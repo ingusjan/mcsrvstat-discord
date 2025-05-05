@@ -126,7 +126,7 @@ export async function createStatusEmbed(
         .join("\n");
 
       embed.addFields({
-        name: "👻 Recently Online",
+        name: "Recently Online",
         value: recentPlayersList,
       });
     }

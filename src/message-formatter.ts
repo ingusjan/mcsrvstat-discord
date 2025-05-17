@@ -99,13 +99,11 @@ export async function createStatusEmbed(
     // Get current online player names or empty array if none
     const onlinePlayerNames: string[] = status.players.list
       ? status.players.list.map((player) => player.name)
-      : [];
-
-    // Add online player list if available
+      : []; // Add online player list if available
     if (onlinePlayerNames.length > 0) {
       embed.addFields({
         name: "👥 Online Now",
-        value: onlinePlayerNames.join(", "),
+        value: onlinePlayerNames.map((name) => `\`${name}\``).join(", "),
       });
     }
 
@@ -117,12 +115,12 @@ export async function createStatusEmbed(
         config.recentPlayerDays
       );
       lastCacheUpdate = now;
-    }
-
-    // Add recently online players (offline now but seen recently)
+    } // Add recently online players (offline now but seen recently)
     if (recentlySeenPlayersCache.length > 0) {
       const recentPlayersList = recentlySeenPlayersCache
-        .map((player) => `${player.name} (${formatLastSeen(player.lastSeen)})`)
+        .map(
+          (player) => `\`${player.name}\` (${formatLastSeen(player.lastSeen)})`
+        )
         .join("\n");
 
       embed.addFields({
